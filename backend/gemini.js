@@ -1,7 +1,10 @@
-import axios from "axios"
-const geminiResponse=async (command,assistantName,userName)=>{
-try {
-    const apiUrl=process.env.GEMINI_API_URL
+import dotenv from "dotenv";
+dotenv.config();
+import axios from "axios";
+
+const geminiResponse = async (command, assistantName, userName) => {
+  try {
+    const apiUrl = process.env.GEMINI_API_URL;
     const prompt = `You are a virtual assistant named ${assistantName} created by ${userName}. 
 You are not Google. You will now behave like a voice-enabled assistant.
 
@@ -42,19 +45,26 @@ Important:
 now your userInput- ${command}
 `;
 
+    const result = await axios.post(
+      apiUrl,
+      {
+        contents: [
+          {
+            parts: [{ text: prompt }],
+          },
+        ],
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      }
+    );
 
+    return result.data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    // Ye line important hai - ab pata chalega Google ne exactly kya error diya
+    console.log("Gemini API Error:", error.response?.data || error.message);
+    throw new Error("Gemini API call failed"); // controller ko pata chalega ki fail hua
+  }
+};
 
-
-
-    const result=await axios.post(apiUrl,{
-    "contents": [{
-    "parts":[{"text": prompt}]
-    }]
-    })
-return result.data.candidates[0].content.parts[0].text
-} catch (error) {
-    console.log(error)
-}
-}
-
-export default geminiResponse
+export default geminiResponse;
