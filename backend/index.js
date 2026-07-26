@@ -7,11 +7,15 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import userRouter from "./routes/user.routes.js"
 import geminiResponse from "./gemini.js"
+import path from "path"
+import { fileURLToPath } from "url"
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app=express()
 app.use(cors({
-    origin:"http://localhost:5173",
+    origin: process.env.NODE_ENV === "production" ? true : "http://localhost:5173",
     credentials:true
 }))
 const port=process.env.PORT || 5000
@@ -20,9 +24,14 @@ app.use(cookieParser())
 app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)
 
+// Serve frontend build (production)
+app.use(express.static(path.join(__dirname, "../frontend/dist")))
+
+app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"))
+})
 
 app.listen(port,()=>{
     connectDb()
     console.log("server started")
 })
-
