@@ -2,6 +2,10 @@ import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs"
 
 const uploadOnCloudinary = async (filePath) => {
+    console.log("Cloud Name:", JSON.stringify(process.env.CLOUDINARY_CLOUD_NAME))
+    console.log("API Key:", JSON.stringify(process.env.CLOUDINARY_API_KEY))
+    console.log("API Secret length:", process.env.CLOUDINARY_API_SECRET?.length)
+
     cloudinary.config({
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
         api_key: process.env.CLOUDINARY_API_KEY,
@@ -15,7 +19,7 @@ const uploadOnCloudinary = async (filePath) => {
     } catch (error) {
         console.log("Cloudinary Upload Error:", error)
         fs.unlinkSync(filePath)
-        throw error   // ← controller ke catch block tak error properly pahunchega
+        throw error
     }
 }
 
