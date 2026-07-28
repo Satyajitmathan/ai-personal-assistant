@@ -6,8 +6,7 @@ An AI-powered voice assistant built with the **MERN stack**, featuring real-time
 
 ## 🚀 Live Demo
 
-- **Frontend:** [Live App](#) <!-- paste your Vercel link here -->
-- **Backend API:** [API URL](#) <!-- paste your Render link here -->
+Live App: https://ai-personal-assistant-z34x.onrender.com
 
 ---
 

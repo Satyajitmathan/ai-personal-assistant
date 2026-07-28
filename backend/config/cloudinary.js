@@ -8,15 +8,6 @@ const uploadOnCloudinary = async (filePath) => {
         api_secret: process.env.CLOUDINARY_API_SECRET
     });
 
-    console.log("Full Config:", cloudinary.config())
-
-    try {
-        const pingResult = await cloudinary.api.ping()
-        console.log("Ping Result:", pingResult)
-    } catch (err) {
-        console.log("Ping Error:", err)
-    }
-
     try {
         const uploadResult = await cloudinary.uploader.upload(filePath, {
             resource_type: "auto",
