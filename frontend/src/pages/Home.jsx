@@ -16,6 +16,7 @@ function Home() {
   const recognitionRef=useRef(null)
   const [ham,setHam]=useState(false)
   const isRecognizingRef=useRef(false)
+  const initializedRef=useRef(false)
   const synth=window.speechSynthesis
 
   const handleLogOut=async ()=>{
@@ -96,6 +97,10 @@ synth.speak(utterence);
   }
 
 useEffect(() => {
+  // Jab tak userData load nahi hota, kuch mat karo (avoids null crashes + race condition)
+  if (!userData || initializedRef.current) return;
+  initializedRef.current = true;
+
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const recognition = new SpeechRecognition();
 
@@ -173,6 +178,12 @@ useEffect(() => {
       handleCommand(data);
       setAiText(data.response);
       setUserText("");
+
+      // History ko turant local state me bhi add karo, refresh ka wait mat karo
+      setUserData(prev => prev ? {
+        ...prev,
+        history: [...(prev.history || []), transcript]
+      } : prev);
     }
   };
 
@@ -190,9 +201,17 @@ useEffect(() => {
     setListening(false);
     isRecognizingRef.current = false;
   };
-}, []);
+}, [userData]);
 
 
+  // Jab tak userData backend se load nahi hota, spinner dikhao
+  if (!userData) {
+    return (
+      <div className='w-full h-[100vh] bg-gradient-to-t from-[black] to-[#02023d] flex justify-center items-center'>
+        <div className='w-[60px] h-[60px] border-4 border-white border-t-transparent rounded-full animate-spin'></div>
+      </div>
+    )
+  }
 
 
   return (
