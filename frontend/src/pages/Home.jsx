@@ -207,8 +207,8 @@ useEffect(() => {
 <h1 className='text-white font-semibold text-[19px]'>History</h1>
 
 <div className='w-full h-[400px] gap-[20px] overflow-y-auto flex flex-col truncate'>
-  {userData.history?.map((his)=>(
-    <div className='text-gray-200 text-[18px] w-full h-[30px]  '>{his}</div>
+  {userData.history?.map((his, index)=>(
+    <div key={index} className='text-gray-200 text-[18px] w-full h-[30px]  '>{his}</div>
   ))}
 
 </div>
@@ -216,6 +216,18 @@ useEffect(() => {
       </div>
       <button className='min-w-[150px] h-[60px] mt-[30px] text-black font-semibold absolute hidden lg:block top-[20px] right-[20px]  bg-white rounded-full cursor-pointer text-[19px] ' onClick={handleLogOut}>Log Out</button>
       <button className='min-w-[150px] h-[60px] mt-[30px] text-black font-semibold  bg-white absolute top-[100px] right-[20px] rounded-full cursor-pointer text-[19px] px-[20px] py-[10px] hidden lg:block ' onClick={()=>navigate("/customize")}>Customize your Assistant</button>
+
+      {/* Desktop History Panel */}
+      <div className='hidden lg:flex flex-col absolute top-[190px] right-[20px] w-[300px] max-h-[400px] bg-[#00000053] backdrop-blur-lg border border-[#ffffff22] rounded-2xl p-[20px] gap-[10px]'>
+        <h1 className='text-white font-semibold text-[19px]'>History</h1>
+        <div className='w-full h-[2px] bg-gray-400'></div>
+        <div className='w-full h-[300px] gap-[15px] overflow-y-auto flex flex-col'>
+          {userData.history?.map((his, index)=>(
+            <div key={index} className='text-gray-200 text-[16px] w-full truncate'>{his}</div>
+          ))}
+        </div>
+      </div>
+
       <div className='w-[300px] h-[400px] flex justify-center items-center overflow-hidden rounded-4xl shadow-lg'>
 <img src={userData?.assistantImage} alt="" className='h-full object-cover'/>
       </div>
