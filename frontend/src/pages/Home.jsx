@@ -97,7 +97,6 @@ synth.speak(utterence);
   }
 
 useEffect(() => {
-  // Jab tak userData load nahi hota, kuch mat karo (avoids null crashes + race condition)
   if (!userData || initializedRef.current) return;
   initializedRef.current = true;
 
@@ -110,9 +109,8 @@ useEffect(() => {
 
   recognitionRef.current = recognition;
 
-  let isMounted = true;  // flag to avoid setState on unmounted component
+  let isMounted = true;
 
-  // Start recognition after 1 second delay only if component still mounted
   const startTimeout = setTimeout(() => {
     if (isMounted && !isSpeakingRef.current && !isRecognizingRef.current) {
       try {
@@ -179,7 +177,6 @@ useEffect(() => {
       setAiText(data.response);
       setUserText("");
 
-      // History ko turant local state me bhi add karo, refresh ka wait mat karo
       setUserData(prev => prev ? {
         ...prev,
         history: [...(prev.history || []), transcript]
@@ -204,7 +201,6 @@ useEffect(() => {
 }, [userData]);
 
 
-  // Jab tak userData backend se load nahi hota, spinner dikhao
   if (!userData) {
     return (
       <div className='w-full h-[100vh] bg-gradient-to-t from-[black] to-[#02023d] flex justify-center items-center'>
@@ -212,6 +208,9 @@ useEffect(() => {
       </div>
     )
   }
+
+  // Latest command sabse upar dikhane ke liye — original array ko mutate kiye bina copy reverse karo
+  const reversedHistory = userData.history ? [...userData.history].reverse() : []
 
 
   return (
@@ -226,7 +225,7 @@ useEffect(() => {
 <h1 className='text-white font-semibold text-[19px]'>History</h1>
 
 <div className='w-full h-[400px] gap-[20px] overflow-y-auto flex flex-col truncate'>
-  {userData.history?.map((his, index)=>(
+  {reversedHistory.map((his, index)=>(
     <div key={index} className='text-gray-200 text-[18px] w-full h-[30px]  '>{his}</div>
   ))}
 
@@ -237,18 +236,26 @@ useEffect(() => {
       <button className='min-w-[150px] h-[60px] mt-[30px] text-black font-semibold  bg-white absolute top-[100px] right-[20px] rounded-full cursor-pointer text-[19px] px-[20px] py-[10px] hidden lg:block ' onClick={()=>navigate("/customize")}>Customize your Assistant</button>
 
       {/* Desktop History Panel */}
-      <div className='hidden lg:flex flex-col absolute top-[190px] right-[20px] w-[300px] max-h-[400px] bg-[#00000053] backdrop-blur-lg border border-[#ffffff22] rounded-2xl p-[20px] gap-[10px]'>
-        <h1 className='text-white font-semibold text-[19px]'>History</h1>
-        <div className='w-full h-[2px] bg-gray-400'></div>
-        <div className='w-full h-[300px] gap-[15px] overflow-y-auto flex flex-col'>
-          {userData.history?.map((his, index)=>(
-            <div key={index} className='text-gray-200 text-[16px] w-full truncate'>{his}</div>
+      <div
+        className='hidden lg:flex flex-col absolute top-[60px] left-[20px] w-[300px] h-[500px] bg-[#00000053] backdrop-blur-lg border border-[#ffffff22] rounded-2xl p-[20px] gap-[10px]'
+      >
+        <h1 className='text-white font-semibold text-[19px] shrink-0'>History</h1>
+        <div className='w-full h-[2px] bg-gray-400 shrink-0'></div>
+        <div
+          className='w-full flex-1 overflow-y-auto flex flex-col gap-[15px] pr-[8px] custom-scrollbar'
+          style={{
+            WebkitMaskImage: 'linear-gradient(to bottom, black 90%, transparent 100%)',
+            maskImage: 'linear-gradient(to bottom, black 90%, transparent 100%)'
+          }}
+        >
+          {reversedHistory.map((his, index)=>(
+            <div key={index} className='text-gray-200 text-[15px] w-full leading-snug break-words'>{his}</div>
           ))}
         </div>
       </div>
 
       <div className='w-[300px] h-[400px] flex justify-center items-center overflow-hidden rounded-4xl shadow-lg'>
-<img src={userData?.assistantImage} alt="" className='h-full object-cover'/>
+        <img src={userData?.assistantImage} alt="" className='h-full object-cover'/>
       </div>
       <h1 className='text-white text-[18px] font-semibold'>I'm {userData?.assistantName}</h1>
       {!aiText && <img src={userImg} alt="" className='w-[200px]'/>}
